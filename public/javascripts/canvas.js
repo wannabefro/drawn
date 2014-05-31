@@ -31,6 +31,7 @@ socket.on('draw:started', function(uid, event) {
     path.strokeWidth = 20;
     path.strokeCap = 'round';
     path.add(point);
+    paper.view.update();
   }
 });
 
@@ -39,6 +40,7 @@ socket.on('draw:progress', function(uid, event) {
     path = paths[uid];
     var point = new Point(event.x, event.y)
     path.add(point);
+    paper.view.update();
   }
 });
 
@@ -60,4 +62,5 @@ socket.on('draw:joined', function(id) {
 
 socket.on('draw:canvasImport', function(data) {
   paper.project.importJSON(data);
+  paper.view.update();
 });
