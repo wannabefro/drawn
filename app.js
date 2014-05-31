@@ -61,6 +61,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 io.on('connection', function(socket) {
+  console.log('user connected');
   socket.on('draw:started', function(uid, event) {
     io.sockets.emit('draw:started', uid, event);
   });
