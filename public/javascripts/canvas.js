@@ -1,5 +1,6 @@
 var path;
 var paths = {};
+var timeouts = {};
 var currentUID = new Date().getTime();
 
 onMouseDown = function(event) {
@@ -23,6 +24,9 @@ onMouseUp = function(event) {
 
 socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
+    timeouts[uid] = setTimeout(function() {
+      paper.view.update();
+    }, 100);
     paths[uid] = new Path();
     path = paths[uid];
     var point = new Point(event.x, event.y)
@@ -31,7 +35,6 @@ socket.on('draw:started', function(uid, event) {
     path.strokeWidth = 20;
     path.strokeCap = 'round';
     path.add(point);
-    paper.view.update();
   }
 });
 
@@ -48,6 +51,8 @@ socket.on('draw:done', function(uid) {
   if ( currentUID !== uid ) {
     paths[uid].smooth();
     paths[uid] = null;
+    clearTimeout(timeouts[uid]);
+    timeouts[uid] = null;
   }
 });
 
