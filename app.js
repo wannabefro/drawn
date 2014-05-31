@@ -1,3 +1,4 @@
+process.env.PWD = process.cwd();
 var express = require('express');
 var expressLayouts = require('express-ejs-layouts');
 var path = require('path');
@@ -22,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
-app.use(express.static('public'));
+app.use(express.static(path.join(process.env.PWD, 'public')));
 app.use(expressLayouts);
 
 app.use('/', routes);
