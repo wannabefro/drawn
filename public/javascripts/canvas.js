@@ -48,3 +48,16 @@ socket.on('draw:done', function(uid) {
     paths[uid] = null;
   }
 });
+
+socket.on('draw:canvasExport', function(data) {
+  paper.project.importJSON(data);
+});
+
+socket.on('draw:joined', function(id) {
+  var data = paper.project.exportJSON();
+  socket.emit('draw:canvasExport', id, data);
+});
+
+socket.on('draw:canvasImport', function(data) {
+  paper.project.importJSON(data);
+});

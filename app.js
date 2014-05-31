@@ -61,8 +61,14 @@ app.use(function(err, req, res, next) {
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var clients = [];
+var lastConnected;
 io.on('connection', function(socket) {
-  console.log('user connected');
+  clients.push(socket);
+  lastConnected = socket.id;
+  if ( clients.length > 1 ) {
+    socket.to(clients[0].id).emit('draw:joined', socket.id);
+  }
   socket.on('draw:started', function(uid, event) {
     io.sockets.emit('draw:started', uid, event);
   });
@@ -72,7 +78,17 @@ io.on('connection', function(socket) {
   socket.on('draw:done', function(uid) {
     io.sockets.emit('draw:done', uid);
   });
+  socket.on('draw:canvasExport', function(id, data) {
+    setTimeout(function() {
+      socket.to(id).emit('draw:canvasImport', data);
+    }, 500);
+  });
+  socket.on('disconnect', function() {
+    var i = clients.indexOf(socket);
+    clients.splice(i, 1);
+  });
 });
+
 
 http.listen(app.get('port'), function() {
   console.log('hello world');
