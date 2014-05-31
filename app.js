@@ -59,20 +59,20 @@ app.use(function(err, req, res, next) {
 });
 
 var http = require('http').Server(app);
-// var io = require('socket.io')(http);
+var io = require('socket.io')(http);
 
-// io.on('connection', function(socket) {
-//   console.log('user connected');
-//   socket.on('draw:started', function(uid, event) {
-//     io.sockets.emit('draw:started', uid, event);
-//   });
-//   socket.on('draw:progress', function(uid, event) {
-//     io.sockets.emit('draw:progress', uid, event);
-//   });
-//   socket.on('draw:done', function(uid) {
-//     io.sockets.emit('draw:done', uid);
-//   });
-// });
+io.on('connection', function(socket) {
+  console.log('user connected');
+  socket.on('draw:started', function(uid, event) {
+    io.sockets.emit('draw:started', uid, event);
+  });
+  socket.on('draw:progress', function(uid, event) {
+    io.sockets.emit('draw:progress', uid, event);
+  });
+  socket.on('draw:done', function(uid) {
+    io.sockets.emit('draw:done', uid);
+  });
+});
 
 http.listen(app.get('port'), function() {
   console.log('hello world');

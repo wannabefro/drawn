@@ -17,6 +17,7 @@ onMouseDrag = function(event) {
 }
 
 onMouseUp = function(event) {
+  path.smooth();
   socket.emit('draw:done', currentUID);
 }
 
@@ -43,6 +44,7 @@ socket.on('draw:progress', function(uid, event) {
 
 socket.on('draw:done', function(uid) {
   if ( currentUID !== uid ) {
+    paths[uid].smooth();
     paths[uid] = null;
   }
 });
