@@ -16,5 +16,9 @@
     "node-compass": "0.2.3",
     "socket.io": "^1.0.2",
     "static-favicon": "~1.0.0"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "latest"
   }
 }
