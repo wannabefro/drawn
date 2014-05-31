@@ -81,7 +81,7 @@ io.on('connection', function(socket) {
   socket.on('draw:canvasExport', function(id, data) {
     setTimeout(function() {
       socket.to(id).emit('draw:canvasImport', data);
-    }, 500);
+    }, 100);
   });
   socket.on('disconnect', function() {
     var i = clients.indexOf(socket);
