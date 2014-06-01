@@ -25,6 +25,7 @@ onMouseUp = function(event) {
 socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
     timeouts[uid] = setTimeout(function() {
+      paths[uid].smooth();
       paper.view.update();
     }, 100);
     paths[uid] = new Path();
