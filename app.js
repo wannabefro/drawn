@@ -97,7 +97,8 @@ io.on('connection', function(socket) {
     }, 100);
   });
   socket.on('draw:save', function(data) {
-    console.log('saving');
+    console.log(data);
+    console.log(room);
     var room = socket.rooms[1];
     Canvas.findByIdAndUpdate(room, {data: data});
   });
