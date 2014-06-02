@@ -69,10 +69,8 @@ function start() {
 function getVideo(offer) {
   getUserMedia({audio: true, video: true}, 
                function(stream) {
-                 trace('hi');
                  localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
-                 trace("adding stream");
                  pc.addStream(stream);
                  if (!!offer) {
                    acceptOffer(offer);
@@ -90,13 +88,17 @@ function call() {
 }
 
 function hangup() {
+  reset();
+  socket.emit('video:ended');
+}
+
+function reset() {
   pc.close();
   localStream.stop();
   hangupButton.disabled = true;
   startButton.disabled = false;
-  socket.emit('video:ended');
+  video.style.display = 'none';
 }
-
 
 function makeOffer() {
   pc.createOffer(function(offer) {
@@ -130,8 +132,5 @@ socket.on('video:answer', function(answer) {
 });
 
 socket.on('video:ended', function() {
-  pc.close();
-  localStream.stop();
-  hangupButton.disabled = true;
-  startButton.disabled = false;
+  reset();
 });
