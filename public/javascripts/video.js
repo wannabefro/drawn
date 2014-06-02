@@ -1,5 +1,4 @@
 var startButton, callButton, hangupButton, pc, video, localVideo, remoteVideo;
-var IceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 var server = {
   iceServers: [
     {url: "stun:stun.l.google.com:19302"}
@@ -14,7 +13,7 @@ var options = {
 
 var constraints = {
   mandatory: {
-    OfferToReceiveAudio: false,
+    OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
   }
 };
@@ -50,12 +49,11 @@ function createPC() {
     if (!e.candidate) { return; }
     pc.onicecandidate = null;
     socket.on('video:iceCandidate', function(candidate) {
-      pc.addIceCandidate(new IceCandidate(JSON.parse(candidate)));
+      pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
     });
     socket.emit('video:iceCandidate', JSON.stringify(e.candidate));
   };
   pc.onaddstream = function(obj) {
-    console.log('hello');
     remoteVideo.src = window.URL.createObjectURL(obj.stream);
     remoteVideo.play();
   };
@@ -70,6 +68,7 @@ function start() {
 function getVideo(offer) {
   getUserMedia({audio: false, video: true}, 
                function(stream) {
+                 localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
                  localVideo.play();
                  pc.addStream(stream);
