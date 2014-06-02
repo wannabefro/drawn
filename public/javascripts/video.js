@@ -1,4 +1,4 @@
-var startButton, callButton, hangupButton, pc1, pc2, video, localVideo, remoteVideo;
+var startButton, callButton, hangupButton, pc, video, localVideo, remoteVideo;
 $(function() {
   video = document.getElementById("video");
   localVideo = document.getElementById("local");
@@ -20,12 +20,12 @@ function trace(text) {
 }
 
 function gotStream(stream) {
-  pc1 = new RTCPeerConnection();
+  pc = new RTCPeerConnection();
   video.style.display = "block";
   localVideo.src = window.URL.createObjectURL(stream);
   localStream = stream;
   callButton.disabled = false;
-  pc1.addStream(localStream);
+  pc.addStream(localStream);
 }
 
 function start() {
@@ -36,17 +36,38 @@ function start() {
                });
 }
 
-// Use sockets to call the second user, on acceptance send back pc2 and then establish connection between the 2
 function call() {
-  socket.emit('video:call', JSON.stringify(pc1));
+  makeOffer();
 }
 
 function hangup() {
 }
 
-socket.on('video:callReceived', function(pc) {
-  var pc = JSON.parse(pc);
-  pc1 = pc;
-  pc2 = new RTCPeerConnection();
-  socket.emit('video:callAccepted', JSON.stringify(pc2));
+function error(e) {
+  trace(e);
+}
+
+function makeOffer() {
+  pc.createOffer(function(offer) {
+    pc.setLocalDescription(new RTCSessionDescription(offer), function() {
+      socket.emit('video:offer', JSON.stringify(offer));
+    }, error);
+  }, error);
+};
+
+socket.on('video:offer', function(offer) {
+  pc = new RTCPeerConnection();
+  var offer = JSON.parse(offer);
+  pc.setRemoteDescription(new RTCSessionDescription(offer), function() {
+    pc.createAnswer(function(answer) {
+      pc.setLocalDescription(new RTCSessionDescription(answer), function() {
+        socket.emit('video:answer', JSON.stringify(answer));
+      });
+    }, error);
+  }, error);
+});
+
+socket.on('video:answer', function(answer) {
+  var answer = JSON.parse(answer);
+  pc.setRemoteDescription(new RTCSessionDescription(answer), function() { }, error);
 });

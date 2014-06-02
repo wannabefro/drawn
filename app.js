@@ -83,11 +83,11 @@ io.on('connection', function(socket) {
       socket.to(id).emit('draw:canvasImport', data);
     }, 100);
   });
-  socket.on('video:call', function(pc) {
-    io.sockets.emit('video:callReceived', pc);
+  socket.on('video:offer', function(offer) {
+    socket.broadcast.emit('video:offer', offer);
   });
-  socket.on('video:callAccepted', function(pc) {
-    io.sockets.emit('video:callAccepted', pc);
+  socket.on('video:answer', function(answer) {
+    socket.broadcast.emit('video:answer', answer);
   });
   socket.on('disconnect', function() {
     var i = clients.indexOf(socket);
