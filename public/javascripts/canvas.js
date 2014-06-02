@@ -80,5 +80,5 @@ socket.on('draw:load', function(data) {
 
 window.onbeforeunload = function() {
   var data = paper.project.exportJSON();
-  socket.emit('draw:save', data);
+  socket.emit('draw:save', data, room);
 }

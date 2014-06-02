@@ -96,10 +96,7 @@ io.on('connection', function(socket) {
       socket.to(id).emit('draw:canvasImport', data);
     }, 100);
   });
-  socket.on('draw:save', function(data) {
-    console.log(data);
-    console.log(room);
-    var room = socket.rooms[1];
+  socket.on('draw:save', function(data, room) {
     Canvas.findByIdAndUpdate(room, {data: data});
   });
   socket.on('video:offer', function(offer) {
