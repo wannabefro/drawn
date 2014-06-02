@@ -69,6 +69,7 @@ function start() {
 function getVideo(offer) {
   getUserMedia({audio: true, video: true}, 
                function(stream) {
+                 trace('hi');
                  localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
                  trace("adding stream");
@@ -106,7 +107,6 @@ function makeOffer() {
 };
 
 socket.on('video:offer', function(offer) {
-  trace(offer);
   var offer = JSON.parse(offer);
   getVideo(offer);
   startButton.disabled = true;
