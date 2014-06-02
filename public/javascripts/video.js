@@ -38,7 +38,15 @@ function start() {
 
 // Use sockets to call the second user, on acceptance send back pc2 and then establish connection between the 2
 function call() {
+  socket.emit('video:call', JSON.stringify(pc1));
 }
 
 function hangup() {
 }
+
+socket.on('video:callReceived', function(pc) {
+  var pc = JSON.parse(pc);
+  pc1 = pc;
+  pc2 = new RTCPeerConnection();
+  socket.emit('video:callAccepted', JSON.stringify(pc2));
+});
