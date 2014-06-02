@@ -61,6 +61,7 @@ function createPC() {
 }
 
 function start() {
+  video.style.display = 'block';
   getVideo();
   startButton.disabled = true;
   callButton.disabled = false;
