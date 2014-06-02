@@ -50,6 +50,7 @@ function createPC() {
     if (!e.candidate) { return; }
     pc.onicecandidate = null;
     socket.on('video:iceCandidate', function(candidate) {
+      trace(candiate);
       pc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
     });
     socket.emit('video:iceCandidate', JSON.stringify(e.candidate));
@@ -121,6 +122,7 @@ function acceptOffer(offer) {
 };
 
 socket.on('video:answer', function(answer) {
+  trace(answer);
   var answer = JSON.parse(answer);
   pc.setRemoteDescription(new RTCSessionDescription(answer));
 });
