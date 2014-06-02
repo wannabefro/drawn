@@ -1,6 +1,8 @@
 var path;
 var paths = {};
 var timeouts = {};
+var room = document.URL.split('/').pop();
+socket.emit('room', room);
 var currentUID = new Date().getTime();
 
 onMouseDown = function(event) {

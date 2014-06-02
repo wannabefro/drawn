@@ -6,6 +6,9 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var mongopath = (process.env.mongo || 'mongodb://localhost/drawn')
+mongoose.connect(mongopath);
 
 var routes = require('./routes/index');
 
@@ -61,22 +64,27 @@ app.use(function(err, req, res, next) {
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-var clients = [];
-var lastConnected;
+var clients = {};
 io.on('connection', function(socket) {
-  clients.push(socket);
-  lastConnected = socket.id;
-  if ( clients.length > 1 ) {
-    socket.to(clients[0].id).emit('draw:joined', socket.id);
-  }
+  socket.on('room', function(room) {
+    socket.join(room);
+    clients[room] = clients[room] || [];
+    clients[room].push(socket.id);
+    if ( clients[room].length > 1 ) {
+      socket.to(clients[room][0]).emit('draw:joined', socket.id);
+    }
+  });
   socket.on('draw:started', function(uid, event) {
-    io.sockets.emit('draw:started', uid, event);
+    var room = socket.rooms[1];
+    io.in(room).emit('draw:started', uid, event);
   });
   socket.on('draw:progress', function(uid, event) {
-    io.sockets.emit('draw:progress', uid, event);
+    var room = socket.rooms[1];
+    io.in(room).emit('draw:progress', uid, event);
   });
   socket.on('draw:done', function(uid) {
-    io.sockets.emit('draw:done', uid);
+    var room = socket.rooms[1];
+    io.in(room).emit('draw:done', uid);
   });
   socket.on('draw:canvasExport', function(id, data) {
     setTimeout(function() {
@@ -96,8 +104,13 @@ io.on('connection', function(socket) {
     socket.broadcast.emit('video:iceCandidate', candidate);
   });
   socket.on('disconnect', function() {
-    var i = clients.indexOf(socket);
-    clients.splice(i, 1);
+    try {
+      var room = socket.rooms[1];
+      var i = clients[room].indexOf(socket.id);
+      clients[room].splice(i, 1);
+    }
+    catch(e) {
+    }
   });
 });
 
