@@ -2,7 +2,7 @@ var startButton, callButton, hangupButton, pc, video, localVideo, remoteVideo;
 var server = {
   iceServers: [
     {url: "stun:stun.l.google.com:19302"},
-    {url: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
+    {url: "turn:numb.viagenie.ca", credential: "drawn", username: "sam.mctaggart+webrtc@gmail.com"}
   ]
 }
 
