@@ -93,7 +93,6 @@ function hangup() {
 }
 
 function reset() {
-  pc.close();
   localStream.stop();
   hangupButton.disabled = true;
   startButton.disabled = false;
