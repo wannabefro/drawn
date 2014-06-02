@@ -1,7 +1,8 @@
 var startButton, callButton, hangupButton, pc, video, localVideo, remoteVideo;
 var server = {
   iceServers: [
-    {url: "stun:stun.l.google.com:19302"}
+    {url: "stun:stun.l.google.com:19302"},
+    {url: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
   ]
 }
 
@@ -55,7 +56,6 @@ function createPC() {
   };
   pc.onaddstream = function(obj) {
     remoteVideo.src = window.URL.createObjectURL(obj.stream);
-    remoteVideo.play();
   };
 }
 
@@ -66,11 +66,10 @@ function start() {
 }
 
 function getVideo(offer) {
-  getUserMedia({audio: false, video: true}, 
+  getUserMedia({audio: true, video: true}, 
                function(stream) {
                  localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
-                 localVideo.play();
                  pc.addStream(stream);
                  if (!!offer) {
                    acceptOffer(offer);
@@ -90,6 +89,8 @@ function call() {
 function hangup() {
   pc.close();
   localStream.stop();
+  hangupButton.disabled = true;
+  startButton.disabled = false;
   socket.emit('video:ended');
 }
 
@@ -105,6 +106,8 @@ function makeOffer() {
 socket.on('video:offer', function(offer) {
   var offer = JSON.parse(offer);
   getVideo(offer);
+  startButton.disabled = true;
+  hangupButton.disabled = false;
 });
 
 function acceptOffer(offer) {
@@ -119,10 +122,12 @@ function acceptOffer(offer) {
 
 socket.on('video:answer', function(answer) {
   var answer = JSON.parse(answer);
-  pc.setRemoteDescription(new RTCSessionDescription(answer), function() { }, error);
+  pc.setRemoteDescription(new RTCSessionDescription(answer));
 });
 
 socket.on('video:ended', function() {
   pc.close();
   localStream.stop();
+  hangupButton.disabled = true;
+  startButton.disabled = false;
 });
