@@ -107,6 +107,7 @@ function makeOffer() {
 
 socket.on('video:offer', function(offer) {
   var offer = JSON.parse(offer);
+  trace(offer);
   getVideo(offer);
   startButton.disabled = true;
   hangupButton.disabled = false;
