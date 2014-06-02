@@ -89,6 +89,12 @@ io.on('connection', function(socket) {
   socket.on('video:answer', function(answer) {
     socket.broadcast.emit('video:answer', answer);
   });
+  socket.on('video:ended', function(answer) {
+    socket.broadcast.emit('video:ended');
+  });
+  socket.on('video:iceCandidate', function(candidate) {
+    socket.broadcast.emit('video:iceCandidate', candidate);
+  });
   socket.on('disconnect', function() {
     var i = clients.indexOf(socket);
     clients.splice(i, 1);
