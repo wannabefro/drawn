@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var mongopath = (process.env.mongo || 'mongodb://localhost/drawn')
+var Canvas = require('./models/canvas');
 mongoose.connect(mongopath);
 
 var routes = require('./routes/index');
@@ -72,6 +73,10 @@ io.on('connection', function(socket) {
     clients[room].push(socket.id);
     if ( clients[room].length > 1 ) {
       socket.to(clients[room][0]).emit('draw:joined', socket.id);
+    } else {
+      var canvas = Canvas.findById(room, function(err, canvas){
+        io.in(room).emit('draw:load', canvas.data);
+      });
     }
   });
   socket.on('draw:started', function(uid, event) {
@@ -90,6 +95,10 @@ io.on('connection', function(socket) {
     setTimeout(function() {
       socket.to(id).emit('draw:canvasImport', data);
     }, 100);
+  });
+  socket.on('draw:save', function(data) {
+    var room = socket.rooms[1];
+    Canvas.findByIdAndUpdate(room, {data: data});
   });
   socket.on('video:offer', function(offer) {
     socket.broadcast.emit('video:offer', offer);

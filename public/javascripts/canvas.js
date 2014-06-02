@@ -72,3 +72,13 @@ socket.on('draw:canvasImport', function(data) {
   paper.project.importJSON(data);
   paper.view.update();
 });
+
+socket.on('draw:load', function(data) {
+  paper.project.importJSON(data);
+  paper.view.update();
+});
+
+window.onbeforeunload = function() {
+  var data = paper.project.exportJSON();
+  socket.emit('draw:save', data);
+}
