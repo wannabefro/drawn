@@ -71,6 +71,7 @@ function getVideo(offer) {
                function(stream) {
                  localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
+                 trace("adding stream");
                  pc.addStream(stream);
                  if (!!offer) {
                    acceptOffer(offer);
