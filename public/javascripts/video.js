@@ -91,6 +91,7 @@ function hangup() {
 function reset() {
   caller = null;
   localStream.stop();
+  $('#hangup').remove();
   video.style.display = 'none';
 }
 
