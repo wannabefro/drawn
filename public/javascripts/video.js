@@ -1,4 +1,4 @@
-var startButton, callButton, hangupButton, pc, video, localVideo, remoteVideo;
+var currentID, hangupButton, pc, video, localVideo, remoteVideo, caller;
 var server = {
   iceServers: [
     {url: "stun:stun.l.google.com:19302"},
@@ -24,16 +24,10 @@ $(function() {
   video = document.getElementById("video");
   localVideo = document.getElementById("local");
   remoteVideo = document.getElementById("remote");
+  users = document.getElementById("users");
 
-  startButton = document.getElementById("startButton");
-  callButton = document.getElementById("callButton");
-  hangupButton = document.getElementById("hangupButton");
-  startButton.disabled = false;
-  callButton.disabled = true;
-  hangupButton.disabled = true;
-  startButton.onclick = start;
-  callButton.onclick = call;
-  hangupButton.onclick = hangup;
+  users.onclick = videoCall;
+
 });
 
 function trace(text) {
@@ -60,77 +54,78 @@ function createPC() {
   };
 }
 
-function start() {
-  video.style.display = 'block';
-  getVideo();
-  startButton.disabled = true;
-  callButton.disabled = false;
-}
-
-function getVideo(offer) {
+function getVideo(id, offer) {
   getUserMedia({audio: true, video: true}, 
                function(stream) {
+                 video.style.display = 'block';
+                 $('#video').append('<button id="hangup">Hang Up</button>').on('click', hangup);
                  localStream = stream;
                  localVideo.src = URL.createObjectURL(stream);
                  pc.addStream(stream);
-                 if (!!offer) {
-                   acceptOffer(offer);
-                 }
+                 connect(id, offer);
                },
                function(error) {
                  trace("getUserMedia error: ", error);
                });
 }
 
-function call() {
-  makeOffer();
-  callButton.disabled = true;
-  hangupButton.disabled = false;
+function videoCall(e) {
+  var id = e.target.innerHTML;
+  getVideo(id);
+}
+
+function connect(id, offer) {
+  caller = id;
+  if (!!offer && !!id) {
+    acceptOffer(offer, id);
+  } else if (!!id) {
+    makeOffer(id);
+  }
 }
 
 function hangup() {
+  socket.emit('video:ended', {to: caller});
   reset();
-  socket.emit('video:ended');
 }
 
 function reset() {
+  caller = null;
   localStream.stop();
-  hangupButton.disabled = true;
-  startButton.disabled = false;
   video.style.display = 'none';
 }
 
-function makeOffer() {
+function makeOffer(id) {
   pc.createOffer(function(offer) {
     pc.setLocalDescription(new RTCSessionDescription(offer), function() {
-      socket.emit('video:offer', JSON.stringify(offer));
+      socket.emit('video:offer', {offer: JSON.stringify(offer), from: currentID, to: id});
     }, error);
   }, error, constraints);
 };
 
-socket.on('video:offer', function(offer) {
+socket.on('video:offer', function(offer, id) {
   var offer = JSON.parse(offer);
-  getVideo(offer);
-  startButton.disabled = true;
-  hangupButton.disabled = false;
+  getVideo(id, offer);
 });
 
-function acceptOffer(offer) {
+function acceptOffer(offer, id) {
   pc.setRemoteDescription(new RTCSessionDescription(offer), function() {
     pc.createAnswer(function(answer) {
       pc.setLocalDescription(new RTCSessionDescription(answer), function() {
-        socket.emit('video:answer', JSON.stringify(answer));
+        socket.emit('video:answer', {answer: JSON.stringify(answer), to: id, from: currentID});
       });
     }, error);
   }, error, constraints);
 };
 
 socket.on('video:answer', function(answer) {
-  trace(answer);
   var answer = JSON.parse(answer);
   pc.setRemoteDescription(new RTCSessionDescription(answer));
 });
 
 socket.on('video:ended', function() {
   reset();
+});
+
+socket.on('room:users', function(clients, id) {
+  currentID = id;
 });

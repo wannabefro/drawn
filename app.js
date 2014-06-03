@@ -70,15 +70,16 @@ io.on('connection', function(socket) {
   socket.on('room', function(room) {
     socket.join(room);
     clients[room] = clients[room] || [];
+    socket.emit('room:users', clients[room], socket.id);
     clients[room].push(socket.id);
     if ( clients[room].length > 1 ) {
       socket.to(clients[room][0]).emit('draw:joined', socket.id);
     } else {
       var canvas = Canvas.findById(room, function(err, canvas){
-        io.in(room).emit('draw:load', canvas.data);
+        socket.emit('draw:load', canvas.data);
       });
     }
-    socket.broadcast.to(room).emit('joined');
+    socket.broadcast.to(room).emit('room:joined', socket.id);
   });
   socket.on('draw:started', function(uid, event) {
     var room = socket.rooms[1];
@@ -101,14 +102,14 @@ io.on('connection', function(socket) {
     Canvas.findByIdAndUpdate(room, {data: data}, function(err, success){
     });
   });
-  socket.on('video:offer', function(offer) {
-    socket.broadcast.emit('video:offer', offer);
+  socket.on('video:offer', function(data) {
+    socket.to(data.to).emit('video:offer', data.offer, data.from);
   });
-  socket.on('video:answer', function(answer) {
-    socket.broadcast.emit('video:answer', answer);
+  socket.on('video:answer', function(data) {
+    socket.to(data.to).emit('video:answer', data.answer, data.from);
   });
-  socket.on('video:ended', function(answer) {
-    socket.broadcast.emit('video:ended');
+  socket.on('video:ended', function(data) {
+    socket.to(data.to).emit('video:ended');
   });
   socket.on('video:iceCandidate', function(candidate) {
     socket.broadcast.emit('video:iceCandidate', candidate);
@@ -116,6 +117,7 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     try {
       var room = socket.rooms[1];
+      io.in(room).emit('room:left', socket.id);
       var i = clients[room].indexOf(socket.id);
       clients[room].splice(i, 1);
     }

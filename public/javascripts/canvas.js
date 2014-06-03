@@ -1,6 +1,5 @@
 var path;
 var paths = {};
-var timeouts = {};
 var room = document.URL.split('/').pop();
 socket.emit('room', room);
 var currentUID = new Date().getTime();
@@ -26,10 +25,6 @@ onMouseUp = function(event) {
 
 socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
-    timeouts[uid] = setTimeout(function() {
-      paths[uid].smooth();
-      paper.view.update();
-    }, 100);
     paths[uid] = new Path();
     path = paths[uid];
     var point = new Point(event.x, event.y)
@@ -46,6 +41,7 @@ socket.on('draw:progress', function(uid, event) {
     path = paths[uid];
     var point = new Point(event.x, event.y)
     path.add(point);
+    path.smooth();
     paper.view.update();
   }
 });
@@ -54,8 +50,6 @@ socket.on('draw:done', function(uid) {
   if ( currentUID !== uid ) {
     paths[uid].smooth();
     paths[uid] = null;
-    clearTimeout(timeouts[uid]);
-    timeouts[uid] = null;
   }
 });
 
@@ -78,11 +72,23 @@ socket.on('draw:load', function(data) {
   paper.view.update();
 });
 
-socket.on('joined', function() {
+socket.on('room:users', function(clients, id) {
+  var users = $('#users');
+  clients.forEach(function(client) {
+    users.append('<p>' + client + '</p>');
+  });
+});
+
+socket.on('room:left', function(id) {
+  $('p:contains("' + id + '")').remove();
+});
+
+socket.on('room:joined', function(id) {
   $('body').prepend('<p class="notice">A new artist has joined</p>');
   setTimeout(function() {
     $('.notice').remove();
   }, 2000);
+  $('#users').append('<p>' + id + '</p>');
 });
 
 window.onbeforeunload = function() {
