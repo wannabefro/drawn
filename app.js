@@ -78,6 +78,7 @@ io.on('connection', function(socket) {
         io.in(room).emit('draw:load', canvas.data);
       });
     }
+    socket.broadcast.to(room).emit('joined');
   });
   socket.on('draw:started', function(uid, event) {
     var room = socket.rooms[1];

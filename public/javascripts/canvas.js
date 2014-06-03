@@ -78,6 +78,13 @@ socket.on('draw:load', function(data) {
   paper.view.update();
 });
 
+socket.on('joined', function() {
+  $('body').prepend('<p class="notice">A new artist has joined</p>');
+  setTimeout(function() {
+    $('.notice').remove();
+  }, 2000);
+});
+
 window.onbeforeunload = function() {
   var data = paper.project.exportJSON();
   socket.emit('draw:save', data, room);
