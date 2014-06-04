@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  #users
+  #video
+    video#local(autoplay muted=true)
+    video#remote(autoplay)
+  canvas#canvas(resize)
+
+block scripts
+  script(src="/javascripts/paper.js")
+  script(src="/javascripts/canvas.js" type="text/paperscript" canvas="canvas" keepalive="true")
+  script(src="/javascripts/video.js")

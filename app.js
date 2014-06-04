@@ -1,6 +1,5 @@
 process.env.PWD = process.cwd();
 var express = require('express');
-var expressLayouts = require('express-ejs-layouts');
 var path = require('path');
 var favicon = require('static-favicon');
 var logger = require('morgan');
@@ -17,7 +16,7 @@ var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
 
 app.set('port', process.env.PORT || 3000);
 
@@ -28,7 +27,6 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(require('node-compass')({mode: 'expanded'}));
 app.use(express.static(path.join(process.env.PWD, 'public'), { maxAge: 86400000 }));
-app.use(expressLayouts);
 
 app.use('/', routes);
 /// catch 404 and forward to error handler

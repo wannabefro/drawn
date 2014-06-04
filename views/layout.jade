@@ -1,0 +1,15 @@
+doctype html
+html(lang='en')
+  head
+    title Drawn title
+    meta(viewport="width=device-width, initial-scale=1, user-scalable=no")
+    link(href="http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css")
+    block head
+  body
+    block content
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/adapter.js")
+    script.
+      var socket = io();
+    block scripts
