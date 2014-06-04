@@ -16,8 +16,7 @@
     "morgan": "~1.0.0",
     "node-compass": "0.2.3",
     "socket.io": "^1.0.2",
-    "static-favicon": "~1.0.0",
-    "grunt": "~0.4.5"
+    "static-favicon": "~1.0.0"
   },
   "engines": {
     "node": "0.10.x",
