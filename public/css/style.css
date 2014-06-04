@@ -1,0 +1,11 @@
+#video {
+  display: none;
+  height: 20%;
+}
+
+video {
+  height: 200px;
+}
+.hide {
+  display: none;
+}
