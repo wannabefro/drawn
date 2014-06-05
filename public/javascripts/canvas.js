@@ -14,16 +14,20 @@ var previousSettings = {
 
 onMouseDown = function(event) {
   path = new Path();
-  path.strokeColor = strokeColor;
-  path.strokeWidth = strokeWidth;
-  path.strokeCap = strokeCap;
+  setupPath(path, {strokeColor: strokeColor, strokeWidth: strokeWidth, strokeCap: strokeCap});
   path.add(event.point);
-  socket.emit('draw:started', currentUID, {x: event.point.x, y: event.point.y});
+  socket.emit('draw:started', currentUID, JSON.stringify({
+    strokeColor: path.strokeColor, 
+    strokeWidth: path.strokeWidth,
+    strokeCap: path.strokeCap,
+    x: event.point.x,
+    y: event.point.y
+  }));
 }
 
 onMouseDrag = function(event) {
   path.add(event.point);
-  socket.emit('draw:progress', currentUID, {x: event.point.x, y: event.point.y});
+  socket.emit('draw:progress', currentUID, JSON.stringify({x: event.point.x, y: event.point.y}));
 }
 
 onMouseUp = function(event) {
@@ -41,6 +45,12 @@ function restorePathSettings() {
   strokeColor = previousSettings.strokeColor;
   strokeWidth = previousSettings.strokeWidth;
   strokeCap = previousSettings.strokeCap;
+}
+
+function setupPath(path, options) {
+  path.strokeColor = options.strokeColor;
+  path.strokeWidth = options.strokeWidth;
+  path.strokeCap = options.strokeCap;
 }
 
 $('button#erase').on('click', function() {
@@ -62,19 +72,19 @@ $('input#color').on('change', function(e) {
 
 socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
+    var event = JSON.parse(event);
     paths[uid] = new Path();
     path = paths[uid];
+    setupPath(path, event);
     var point = new Point(event.x, event.y)
 
-    path.strokeColor = 'black';
-    path.strokeWidth = 20;
-    path.strokeCap = 'round';
     path.add(point);
   }
 });
 
 socket.on('draw:progress', function(uid, event) {
   if ( currentUID !== uid && event ) {
+    var event = JSON.parse(event);
     path = paths[uid];
     var point = new Point(event.x, event.y)
     path.add(point);
