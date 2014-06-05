@@ -5,9 +5,15 @@ block content
   #video
     video#local(autoplay muted=true)
     video#remote(autoplay)
+  #controls
+    button#erase Erase
+    button#draw Draw
+    input#width(type='range' min=1 max=100 value=20)
+    input#color.color
   canvas#canvas(resize)
 
 block scripts
+  script(src="/javascripts/jscolor.js")
   script(src="/javascripts/paper.js")
   script(src="/javascripts/canvas.js" type="text/paperscript" canvas="canvas" keepalive="true")
   script(src="/javascripts/video.js")

@@ -3,12 +3,20 @@ var paths = {};
 var room = document.URL.split('/').pop();
 socket.emit('room', room);
 var currentUID = new Date().getTime();
+var strokeColor = 'black';
+var strokeWidth = 20;
+var strokeCap = 'round';
+var previousSettings = {
+  strokeColor: '',
+  strokeWidth: '',
+  strokeCap: ''
+}
 
 onMouseDown = function(event) {
   path = new Path();
-  path.strokeColor = 'black';
-  path.strokeWidth = 20;
-  path.strokeCap = 'round';
+  path.strokeColor = strokeColor;
+  path.strokeWidth = strokeWidth;
+  path.strokeCap = strokeCap;
   path.add(event.point);
   socket.emit('draw:started', currentUID, {x: event.point.x, y: event.point.y});
 }
@@ -22,6 +30,35 @@ onMouseUp = function(event) {
   path.smooth();
   socket.emit('draw:done', currentUID);
 }
+
+function backupPathSettings() {
+  previousSettings.strokeColor = strokeColor;
+  previousSettings.strokeWidth = strokeWidth;
+  previousSettings.strokeCap = strokeCap;
+}
+
+function restorePathSettings() {
+  strokeColor = previousSettings.strokeColor;
+  strokeWidth = previousSettings.strokeWidth;
+  strokeCap = previousSettings.strokeCap;
+}
+
+$('button#erase').on('click', function() {
+  backupPathSettings();
+  strokeColor = 'white';
+});
+
+$('button#draw').on('click', function() {
+  restorePathSettings();
+});
+
+$('input#width').on('change', function(e) {
+  strokeWidth = e.target.value;
+});
+
+$('input#color').on('change', function(e) {
+  strokeColor = e.target.value;
+});
 
 socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
