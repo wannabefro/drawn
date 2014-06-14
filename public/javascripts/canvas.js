@@ -1,3 +1,7 @@
+var pictureStream;
+var picture = document.getElementById('picture');
+var pictureVideo = document.getElementById('photo');
+var canvas = document.getElementById('photoCanvas');
 var path;
 var paths = {};
 var room = document.URL.split('/').pop();
@@ -53,6 +57,29 @@ function setupPath(path, options) {
   path.strokeCap = options.strokeCap;
 }
 
+function takeAPicture() {
+  getUserMedia({video: true}, function(stream) {
+    pictureVideo.src = window.URL.createObjectURL(stream);
+    pictureStream = stream;
+  }, function(error) {
+    console.log(error);
+  });
+}
+
+function capturePicture() {
+  canvas.width = $(window).width();
+  canvas.height = $(window).height();
+}
+
+$('button#takePicture').on('click', function() {
+  picture.style.display = 'block';
+  takeAPicture();
+});
+
+$('button#capturePicture').on('click', function() {
+  capturePicture();
+});
+
 $('button#erase').on('click', function() {
   backupPathSettings();
   strokeColor = 'white';
@@ -74,8 +101,7 @@ socket.on('draw:started', function(uid, event) {
   if ( currentUID !== uid && event ) {
     var event = JSON.parse(event);
     paths[uid] = new Path();
-    path = paths[uid];
-    setupPath(path, event);
+    setupPath(paths[uid], event);
     var point = new Point(event.x, event.y)
 
     path.add(point);
@@ -85,10 +111,9 @@ socket.on('draw:started', function(uid, event) {
 socket.on('draw:progress', function(uid, event) {
   if ( currentUID !== uid && event ) {
     var event = JSON.parse(event);
-    path = paths[uid];
     var point = new Point(event.x, event.y)
-    path.add(point);
-    path.smooth();
+    paths[uid].add(point);
+    paths[uid].smooth();
     paper.view.update();
   }
 });

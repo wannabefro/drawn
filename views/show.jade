@@ -2,15 +2,20 @@ extends layout
 
 block content
   #users
+  #picture
+    video#photo(autoplay)
+    button#capturePicture Take Picture
   #video
     video#local(autoplay muted=true)
     video#remote(autoplay)
   #controls
+    button#takePicture Take a picture
     button#erase Erase
     button#draw Draw
     input#width(type='range' min=1 max=100 value=20)
     input#color.color
-  canvas#canvas(resize)
+  canvas#photo
+  canvas#photoCanvas(resize)
 
 block scripts
   script(src="/javascripts/jscolor.js")

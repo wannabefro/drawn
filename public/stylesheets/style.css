@@ -11,6 +11,14 @@ a {
   height: 20%;
 }
 
+#picture {
+  display: none;
+}
+
+#photoCanvas {
+  display: none;
+}
+
 video {
   height: 200px;
 }
