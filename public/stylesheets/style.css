@@ -1,9 +1,46 @@
 body {
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 20px Verdana, Helvetica, Arial, sans-serif;
+}
+
+li {
+  list-style-type: none;
+  text-align: center;
+}
+
+button {
+  color: white;
+  font-weight:bold;
+  background-color: #26c9ff;
+  border: none;
+  border-radius: 5%;
+  display:inline-block;
+  padding: 10px 10px;
+  margin-left: 2%;
+  margin-top: 2%;
+  box-shadow:inset -3px -1px 3px 1px #0099FF;
+}
+
+button:hover {
+  background-color:#0099FF;
 }
 
 a {
-  color: #00B7FF;
+  color: white;
+  text-decoration: none;
+}
+
+button#draw {
+  margin-right: 2%;
+}
+
+#width {
+  margin-right: 1%;
+}
+
+#color {
+  padding: .5%;
+  text-align:center;
+  border: solid 2px #0099FF;
 }
 
 #video {
