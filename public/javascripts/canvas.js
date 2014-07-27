@@ -21,7 +21,7 @@ onMouseDown = function(event) {
   setupPath(path, {strokeColor: strokeColor, strokeWidth: strokeWidth, strokeCap: strokeCap});
   path.add(event.point);
   socket.emit('draw:started', currentUID, JSON.stringify({
-    strokeColor: path.strokeColor, 
+    strokeColor: path.strokeColor,
     strokeWidth: path.strokeWidth,
     strokeCap: path.strokeCap,
     x: event.point.x,
@@ -94,7 +94,7 @@ $('input#width').on('change', function(e) {
 });
 
 $('input#color').on('change', function(e) {
-  strokeColor = e.target.value;
+  strokeColor = '#' + e.target.value;
 });
 
 socket.on('draw:started', function(uid, event) {
